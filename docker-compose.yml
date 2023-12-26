@@ -16,8 +16,6 @@ services:
     container_name: "php"
     build:
       context: ./docker/php
-    depends_on:
-      - mysql
     user: "1000:1000"
     ports:
       - 5173:5173

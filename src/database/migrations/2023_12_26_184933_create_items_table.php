@@ -13,10 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('inertia_tests', function (Blueprint $table) {
+        Schema::create('items', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('content');
+            $table->string('name');
+            $table->string('memo')->nullable();
+            $table->integer('price');
+            $table->boolean('is_selling')->default(true);
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('inertia_tests');
+        Schema::dropIfExists('items');
     }
 };

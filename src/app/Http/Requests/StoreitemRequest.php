@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class InertiaTestRequest extends FormRequest
+class StoreitemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class InertiaTestRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -24,8 +24,7 @@ class InertiaTestRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => ['required', 'max:20'],
-            'content' => ['required']
+            //
         ];
     }
 }
