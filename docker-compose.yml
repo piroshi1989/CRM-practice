@@ -19,8 +19,10 @@ services:
     user: "1000:1000"
     ports:
       - 5173:5173
+    depends_on:
+      - mysql
     volumes:
-      - ./src:/var/www/:cached
+      - ./src:/var/www/
       - /src/node_modules
       - /src/vendor
       - ./docker/php/php.ini:/usr/local/etc/php/php.ini
