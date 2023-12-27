@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreitemRequest;
 use App\Http\Requests\UpdateitemRequest;
 use App\Models\item;
+use Inertia\Inertia;
 
 class ItemController extends Controller
 {
@@ -15,7 +16,11 @@ class ItemController extends Controller
      */
     public function index()
     {
-        //
+
+        return Inertia::render('Items/Index', [
+            'items' => Item::select('id', 'name', 'price', 'is_selling')->get()
+            //all()ではすべて選択されてしまうのでselectで必要なもののみ取得。get()をつけるのを忘れない
+        ]);
     }
 
     /**
@@ -25,7 +30,7 @@ class ItemController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Items/Create');
     }
 
     /**
@@ -36,7 +41,13 @@ class ItemController extends Controller
      */
     public function store(StoreitemRequest $request)
     {
-        //
+        Item::Create([
+            'name' => $request->name,
+            'memo' => $request->memo,
+            'price' => $request->price,
+        ]);
+
+        return to_route('items.index');
     }
 
     /**
