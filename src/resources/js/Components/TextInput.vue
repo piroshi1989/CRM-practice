@@ -23,4 +23,5 @@ defineExpose({ focus: () => input.value.focus() });
         @input="$emit('update:modelValue', $event.target.value)"
         ref="input"
     />
+            <!-- 文字を入力したときに値を親に発射する -->
 </template>

@@ -16,11 +16,11 @@ services:
     container_name: "php"
     build:
       context: ./docker/php
-    depends_on:
-      - mysql
-    # user: "1000:1000"
+    user: "1000:1000"
     ports:
       - 5173:5173
+    depends_on:
+      - mysql
     volumes:
       - ./src:/var/www/
       - /src/node_modules
@@ -36,6 +36,7 @@ services:
       MYSQL_PASSWORD: laravel_pass
     command:
       mysqld --default-authentication-plugin=mysql_native_password
+    user: "1000:1000"
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
