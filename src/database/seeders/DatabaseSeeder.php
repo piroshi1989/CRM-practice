@@ -16,9 +16,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
-            ItemSeeder::class
+            ItemSeeder::class,
         ]);
-        // \App\Models\User::factory(10)->create();
+        \App\Models\Customer::factory(1000)->create();
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',

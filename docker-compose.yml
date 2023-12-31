@@ -36,6 +36,7 @@ services:
       MYSQL_PASSWORD: laravel_pass
     command:
       mysqld --default-authentication-plugin=mysql_native_password
+    user: "1000:1000"
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
