@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreitemRequest;
-use App\Http\Requests\UpdateitemRequest;
-use App\Models\item;
+use App\Http\Requests\StoreItemRequest;
+use App\Http\Requests\UpdateItemRequest;
+use App\Models\Item;
 use Inertia\Inertia;
 
 class ItemController extends Controller
@@ -36,10 +36,10 @@ class ItemController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreitemRequest  $request
+     * @param  \App\Http\Requests\StoreItemRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreitemRequest $request)
+    public function store(StoreItemRequest $request)
     {
         Item::Create([
             'name' => $request->name,
@@ -56,10 +56,10 @@ class ItemController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\item  $item
+     * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function show(item $item)
+    public function show(Item $item)
     {
         return Inertia::render('Items/Show', [
             'item' => $item
@@ -69,10 +69,10 @@ class ItemController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\item  $item
+     * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function edit(item $item)
+    public function edit(Item $item)
     {
         return Inertia::render('Items/Edit', [
             'item' => $item
@@ -82,11 +82,11 @@ class ItemController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateitemRequest  $request
-     * @param  \App\Models\item  $item
+     * @param  \App\Http\Requests\UpdateItemRequest  $request
+     * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateitemRequest $request, item $item)
+    public function update(UpdateItemRequest $request, Item $item)
     {
         $item->name = $request->name;
         $item->memo = $request->memo;
@@ -103,10 +103,10 @@ class ItemController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\item  $item
+     * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function destroy(item $item)
+    public function destroy(Item $item)
     {
         $item->delete();
         
