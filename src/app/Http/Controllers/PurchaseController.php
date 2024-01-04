@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\Customer;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
 
 class PurchaseController extends Controller
 {
@@ -19,7 +20,20 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        //
+        // dd(Order::paginate(50));
+        //大量データを表示させたいときはallとかgetを使うと重すぎる
+        //paginateやchunkを使用する
+
+        $orders = Order::groupBy('id')
+        ->selectRaw('id, sum(subtotal) as total,
+        customer_name, status, created_at')
+        ->paginate(50);
+
+        // dd($orders);
+
+        return Inertia::render('Purchases/Index', [
+            'orders' => $orders
+        ]);
     }
 
     /**
@@ -29,7 +43,7 @@ class PurchaseController extends Controller
      */
     public function create()
     {
-        // $customers = Customer::select('id', 'name', 'kana')->get();
+        // $customers = customer::select('id', 'name', 'kana')->get();
         $items = Item::select('id', 'name', 'price')->where('is_selling', true)->get();
 
         return Inertia::render('Purchases/Create', [
@@ -58,7 +72,7 @@ class PurchaseController extends Controller
             ]);
     
             foreach($request->items as $item){
-                $purchase->Items()->attach($purchase->id, [
+                $purchase->items()->attach($purchase->id, [
                     'item_id' => $item['id'],
                     'quantity' => $item['quantity']
                 ]);
@@ -82,7 +96,22 @@ class PurchaseController extends Controller
      */
     public function show(Purchase $purchase)
     {
-        //
+        //小計
+        $items = Order::where('id', $purchase->id)->get();
+
+        //合計
+        $orders = Order::groupBy('id')
+        ->where('id', $purchase->id)
+        ->selectRaw('id, sum(subtotal) as total,
+        customer_name, status, created_at')
+        ->get();
+
+        // dd($items, $orders);
+
+        return Inertia::render('Purchases/Show', [
+            'items' => $items,
+            'order' => $orders
+        ]);
     }
 
     /**
@@ -93,7 +122,42 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
-        //
+        $purchase = Purchase::find($purchase->id);
+
+        $allItems = Item::select('id', 'name', 'price')
+        ->get();
+
+        $items = [];
+        //初期値
+
+        //1件ずつのitemのidを取得する
+        foreach($allItems as $allItem){
+            $quantity = 0;  //初期値0 中間テーブルの情報があれば更新していく
+            foreach($purchase->items as $item){  //中間テーブルに入っているものを1件ずつ取得
+                if($allItem->id === $item->id){ //中間テーブルにIDが存在していたら処理する
+                    $quantity = $item->pivot->quantity; //中間テーブルの数量の情報を取得する
+                }
+            }
+            array_push($items, [
+                'id' => $allItem->id,
+                'name' => $allItem->name,
+                'price' => $allItem->price,
+                'quantity' => $quantity //中間テーブルに数量があれば値が入り、なければ0のまま
+            ]);
+        }
+        // dd($items);
+
+        //合計
+        $order = Order::groupBy('id')
+        ->where('id', $purchase->id)
+        ->selectRaw('id, customer_id,
+        customer_name, status, created_at')
+        ->get();
+
+        return Inertia::render('Purchases/Edit', [
+            'items' => $items,
+            'order' => $order
+        ]);
     }
 
     /**
@@ -105,9 +169,36 @@ class PurchaseController extends Controller
      */
     public function update(UpdatePurchaseRequest $request, Purchase $purchase)
     {
-        //
-    }
+        // dd($request, $purchase);
+        
+        //2つのテーブルを更新するのでトランザクションをかける
+        DB::beginTransaction();
 
+        try{
+        $purchase->status = $request->status;
+        $purchase->save();
+
+        $items = [];
+
+        foreach($request->items as $item){
+            $items = $items + [
+                $item['id'] => [
+                    'quantity' => $item['quantity']
+                ]
+            ];
+        }
+
+        $purchase->items()->sync($item);
+        //中間テーブルの情報を更新するにはsync()が便利
+        //引数に配列が必要
+
+        DB::commit();
+        
+        return to_route('dashboard');
+        } catch(\Exception $e){
+            DB::rollback();
+}
+    }
     /**
      * Remove the specified resource from storage.
      *
