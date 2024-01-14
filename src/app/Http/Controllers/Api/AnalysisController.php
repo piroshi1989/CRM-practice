@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Order;
-use Illuminate\Support\Facades\DB;
+use App\Services\AnalysisService;
+use App\Services\DecileService;
+//fatControllerになってきたのでserviceを作成して避ける
 
 class AnalysisController extends Controller
 {
@@ -16,18 +18,28 @@ class AnalysisController extends Controller
 
         if($request->type === 'perDay')//日別だったら、
         {
-            $subQuery->where('status', true)->groupBy('id') //キャンセルされていないもののみ取得,購買毎
-            ->selectRaw('id, SUM(subtotal) as totalPerPurchase, DATE_FORMAT(created_at, "%Y%m%d") as date');
-            //小計をsumで合計, DATE_FORMAT...mysqlの関数
-            
-            //日別の合計
-            $data = DB::table($subQuery)
-            ->groupBy('date')
-            ->selectRaw('date, sum(totalPerPurchase) as total')->get();
-
-            $labels = $data->pluck('date');
-            $totals = $data->pluck('total');
+            // 配列を受け取り変数に格納するため list() を使う
+            list($data, $labels, $totals) = AnalysisService::perDay($subQuery);
         }
+
+        if($request->type === 'perMonth')//月別だったら、
+        {
+            // 配列を受け取り変数に格納するため list() を使う
+            list($data, $labels, $totals) = AnalysisService::perMonth($subQuery);
+        }
+
+        if($request->type === 'perYear')//年別だったら、
+        {
+            // 配列を受け取り変数に格納するため list() を使う
+            list($data, $labels, $totals) = AnalysisService::perYear($subQuery);
+        }
+
+        if($request->type === 'decile')//デシルだったら、
+        {
+            // 配列を受け取り変数に格納するため list() を使う
+            list($data, $labels, $totals) = DecileService::decile($subQuery);
+        }
+
         //Ajax通信なのでJson形式で返却する必要がある
         return response()->json([
             'data' => $data,
