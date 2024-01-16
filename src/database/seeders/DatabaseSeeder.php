@@ -20,12 +20,13 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             ItemSeeder::class,
+            RankSeeder::class,
         ]);
         \App\Models\Customer::factory(1000)->create();
 
         $items = Item::all();
 
-        Purchase::factory(100)->create()
+        Purchase::factory(30000)->create()
         ->each(function(Purchase $purchase) use ($items){
             //useをつけることで関数の外側で定義した変数を使用することができる
         $purchase->Items()->attach(

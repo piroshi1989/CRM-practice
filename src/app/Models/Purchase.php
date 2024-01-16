@@ -16,12 +16,12 @@ class Purchase extends Model
         'status'
     ];
 
-    public function Customer()
+    public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
 
-    public function Items()
+    public function items()
     {
         return $this->belongsToMany(Item::class)->withPivot('quantity');
         //中間テーブルのリレーションを指定
